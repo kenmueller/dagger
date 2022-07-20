@@ -1,11 +1,7 @@
 <script lang="ts">
-	import latexRef from '$lib/latex/ref'
 	import MetaImage from '../components/Meta/Image.svelte'
 	import MetaTitle from '../components/Meta/Title.svelte'
 	import MetaDescription from '../components/Meta/Description.svelte'
-
-	let code = ''
-	$: result = latexRef(code)
 </script>
 
 <MetaImage />
@@ -13,7 +9,11 @@
 <MetaDescription />
 
 <header>
-<
+	<span id="hamburger">☰</span>
+	<div id="view">
+		<span id="zoom">100%</span><span id="styles">Styles</span>
+	</div>
+</header>
 <main>
 	<textarea placeholder="LaTeX code" bind:value={code} />
 	<p>
@@ -26,6 +26,9 @@
 		{/if}
 	</p>
 </main>
+<footer>
+	<span id="pointer" />
+</footer>
 
 <style lang="scss">
 	:global {

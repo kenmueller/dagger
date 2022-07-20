@@ -1,8 +1,11 @@
 <script lang="ts">
-	import latexRef from '$lib/latex/ref'
+	import toRef from '$lib/ref/to'
+	import latex from '$lib/latex'
 	import MetaImage from '../components/Meta/Image.svelte'
 	import MetaTitle from '../components/Meta/Title.svelte'
 	import MetaDescription from '../components/Meta/Description.svelte'
+
+	const latexRef = toRef(latex)
 
 	let code = ''
 	$: result = latexRef(code)
