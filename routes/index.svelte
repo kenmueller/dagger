@@ -12,7 +12,8 @@
 <MetaTitle />
 <MetaDescription />
 
-<header
+<header>
+<
 <main>
 	<textarea placeholder="LaTeX code" bind:value={code} />
 	<p>
