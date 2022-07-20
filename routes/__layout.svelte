@@ -26,7 +26,6 @@
 		box-sizing: border-box;
 		margin: 0;
 		padding: 0;
-		font-family: font.$family;
 		border: none;
 		outline: none;
 	}
@@ -34,6 +33,19 @@
 	html,
 	body {
 		height: 100%;
+	}
+
+	body {
+		font-family: font.$family;
+	}
+
+	a,
+	button,
+	input,
+	textarea {
+		font-family: inherit;
+		font-size: inherit;
+		font-weight: inherit;
 	}
 
 	a {
