@@ -1,66 +1,72 @@
 <script lang="ts">
+	import type Node from '$lib/node'
 	import MetaImage from '../components/Meta/Image.svelte'
 	import MetaTitle from '../components/Meta/Title.svelte'
 	import MetaDescription from '../components/Meta/Description.svelte'
+	import NodeElement from '../components/Node.svelte'
+
+	let nodes: Node[] = []
 </script>
 
 <MetaImage />
 <MetaTitle />
 <MetaDescription />
 
+<svg
+	><defs
+		><marker
+			id="arrow"
+			viewBox="0 0 10 10"
+			refX="5"
+			refY="5"
+			markerWidth="6"
+			markerHeight="6"
+			orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" /></marker
+		></defs
+	></svg
+>
+
 <header>
-	<span id="hamburger">☰</span>
-	<div id="view">
-		<span id="zoom">100%</span><span id="styles">Styles</span>
+	<span class="hamburger">☰</span>
+	<div class="view">
+		<span class="zoom">100%</span>
+		<span class="styles">Styles</span>
 	</div>
 </header>
-<main>
-	<textarea placeholder="LaTeX code" bind:value={code} />
-	<p>
-		{#if !code}
-			<span class="placeholder">Rendered LaTeX</span>
-		{:else if result.error}
-			<span class="error">{result.error.message}</span>
-		{:else}
-			{@html result.value}
-		{/if}
-	</p>
-</main>
+{#each nodes as node}
+	<NodeElement {node} />
+{/each}
 <footer>
-	<span id="pointer" />
+	<button class="pointer">☝</button>
+	<button
+		class="node"
+		on:click={() =>
+			(nodes = [...nodes, { name: 'Variable', color: 'red', x: 0, y: 0 }])}
+	>
+		⬤
+	</button>
+	<button class="arrow">↗</button>
+	<button class="delete">🗑️</button>
 </footer>
 
 <style lang="scss">
-	:global {
-		@import 'katex/dist/katex';
+	header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		position: absolute;
+		top: 1rem;
+		left: 1rem;
+		right: 1rem;
 	}
 
-	main {
+	footer {
 		display: flex;
-		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		height: 100%;
-	}
-
-	textarea {
-		min-width: 25rem;
-		min-height: 10rem;
-		padding: 0.5rem 0.7rem;
-		background: rgba(black, 0.1);
-		border-radius: 0.5rem;
-	}
-
-	p {
-		min-height: 1.5rem;
-		margin-top: 1rem;
-	}
-
-	.placeholder {
-		opacity: 0.5;
-	}
-
-	.error {
-		color: red;
+		position: absolute;
+		bottom: 1rem;
+		left: 1rem;
+		right: 1rem;
 	}
 </style>

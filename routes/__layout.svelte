@@ -36,6 +36,7 @@
 	}
 
 	body {
+		overflow: hidden;
 		font-family: font.$family;
 	}
 
