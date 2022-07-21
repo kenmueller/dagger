@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { onMount } from 'svelte'
+
 	import type Node from '$lib/node'
 	import MetaImage from '../components/Meta/Image.svelte'
 	import MetaTitle from '../components/Meta/Title.svelte'
@@ -6,6 +8,10 @@
 	import NodeElement from '../components/Node.svelte'
 
 	let nodes: Node[] = []
+
+	onMount(() => {
+		Object.defineProperty(window, 'nodes', { get: () => nodes })
+	})
 </script>
 
 <MetaImage />
@@ -36,7 +42,7 @@
 	</div>
 </header>
 {#each nodes as node}
-	<NodeElement {node} />
+	<NodeElement bind:node />
 {/each}
 <footer>
 	<button class="pointer">☝</button>

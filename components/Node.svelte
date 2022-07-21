@@ -13,25 +13,24 @@
 
 	let editing = false
 
-	$: code = node.name
-	$: result = latexRef(code)
+	$: result = latexRef(node.name)
 
 	const edit = (event: MouseEvent) => {
 		if (!editing) event.stopPropagation()
 		editing = true
 	}
 
-	const blur = () => {
-		editing = false
-		node.name = code
+	const onInput = ({ target }: Event) => {
+		const name = (target as HTMLInputElement | null)?.value
+		if (name) node = { ...node, name }
 	}
 
 	const blurWithKey = ({ key }: KeyboardEvent) => {
-		if (key === 'Enter') blur()
+		if (key === 'Enter') editing = false
 	}
 
 	const blurWithClick = ({ target }: MouseEvent) => {
-		if (input && input !== target) blur()
+		if (input && input !== target) editing = false
 	}
 </script>
 
@@ -47,11 +46,12 @@
 			<CenteredInput
 				bind:ref={input}
 				placeholder="LaTeX code"
-				bind:value={code}
+				value={node.name}
+				on:input={onInput}
 			/>
 		{/if}
 		<p on:click={edit}>
-			{#if !code}
+			{#if !node.name}
 				<span class="placeholder">Rendered LaTeX</span>
 			{:else if result.error}
 				<span class="error">{result.error.message}</span>

@@ -10,6 +10,7 @@
 	bind:this={ref}
 	placeholder={placeholder || undefined}
 	bind:value
+	on:input
 	style="--length: {length};"
 />
 
