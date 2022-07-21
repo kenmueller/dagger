@@ -32,14 +32,40 @@
 	const blurWithClick = ({ target }: MouseEvent) => {
 		if (input && input !== target) editing = false
 	}
+
+	let mouse: { x: number; y: number } | null = null
+
+	const onMouseDown = ({ clientX: x, clientY: y }: MouseEvent) => {
+		mouse = { x, y }
+	}
+
+	const onMouseMove = ({ clientX: x, clientY: y }: MouseEvent) => {
+		if (!mouse) return
+
+		node = {
+			...node,
+			x: node.x + (x - mouse.x),
+			y: node.y - (y - mouse.y)
+		}
+
+		mouse = { x, y }
+	}
+
+	const onMouseUp = () => {
+		mouse = null
+	}
 </script>
 
 <svelte:window on:keyup={blurWithKey} />
-<svelte:body on:click={blurWithClick} />
+<svelte:body
+	on:click={blurWithClick}
+	on:mousemove={onMouseMove}
+	on:mouseup={onMouseUp} />
 
 <div
 	class="outer"
 	style="--color: {node.color}; --x: {node.x}px; --y: {node.y}px;"
+	on:mousedown={onMouseDown}
 >
 	<div class="inner">
 		{#if editing}
