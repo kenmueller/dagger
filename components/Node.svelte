@@ -11,15 +11,27 @@
 	let input: HTMLInputElement | null = null
 	$: input?.focus()
 
-	let name: HTMLParagraphElement | null = null
-
 	let editing = false
 
 	$: code = node.name
 	$: result = latexRef(code)
 
-	const blur = () => {}
+	const edit = (event: MouseEvent) => {
+		if (!editing) event.stopPropagation()
+		editing = true
+	}
+
+	const blurWithKey = ({ key }: KeyboardEvent) => {
+		if (key === 'Enter') editing = false
+	}
+
+	const blurWithClick = ({ target }: MouseEvent) => {
+		if (input && input !== target) editing = false
+	}
 </script>
+
+<svelte:window on:keyup={blurWithKey} />
+<svelte:body on:click={blurWithClick} />
 
 <div
 	class="outer"
@@ -33,7 +45,7 @@
 				bind:value={code}
 			/>
 		{/if}
-		<p bind:this={name} on:click={() => (editing = true)}>
+		<p on:click={edit}>
 			{#if !code}
 				<span class="placeholder">Rendered LaTeX</span>
 			{:else if result.error}
