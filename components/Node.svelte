@@ -21,12 +21,17 @@
 		editing = true
 	}
 
+	const blur = () => {
+		editing = false
+		node.name = code
+	}
+
 	const blurWithKey = ({ key }: KeyboardEvent) => {
-		if (key === 'Enter') editing = false
+		if (key === 'Enter') blur()
 	}
 
 	const blurWithClick = ({ target }: MouseEvent) => {
-		if (input && input !== target) editing = false
+		if (input && input !== target) blur()
 	}
 </script>
 
