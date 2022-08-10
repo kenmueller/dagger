@@ -99,8 +99,8 @@
 
 	.outer {
 		position: absolute;
-		left: calc(50vw + var(--x) + var(--center-x));
-		top: calc(50vh - var(--y) - var(--center-y));
+		left: calc(50% + var(--x) + var(--center-x));
+		top: calc(50% - var(--y) - var(--center-y));
 		width: calc(2 * var(--radius));
 		height: calc(2 * var(--radius));
 		background: var(--color);

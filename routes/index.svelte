@@ -31,7 +31,7 @@
 		dragging = false
 	}
 
-	const onClick = ({ offsetX: x, offsetY: y }: MouseEvent) => {
+	const onClick = ({ clientX: x, clientY: y }: MouseEvent) => {
 		if (!($view && tool === 'node')) return
 
 		nodes = [
@@ -83,13 +83,11 @@
 <MetaDescription />
 
 <header>
-	<span class="hamburger">☰</span>
-	<div class="view">
-		<span class="zoom">100%</span>
-		<span class="styles">Styles</span>
-	</div>
+	<span class="styles">Styles</span>
 </header>
 <main on:mousedown={onMouseDown} on:click={onClick}>
+	<span class="x" style="--y: {center.y}px;" />
+	<span class="y" style="--x: {center.x}px;" />
 	{#each nodes as node}
 		<NodeElement bind:node {center} />
 	{/each}
@@ -107,9 +105,8 @@
 		justify-content: space-between;
 		align-items: center;
 		position: absolute;
-		top: 1rem;
-		left: 1rem;
 		right: 1rem;
+		top: 1rem;
 		z-index: 100;
 	}
 
@@ -120,6 +117,29 @@
 		bottom: 0;
 		left: 0;
 		z-index: 0;
+	}
+
+	.x,
+	.y {
+		position: absolute;
+		background: rgba(black, 0.1);
+		z-index: 100;
+	}
+
+	.x {
+		left: 0;
+		right: 0;
+		top: calc(50% - var(--y));
+		height: 1px;
+		transform: translateY(-50%);
+	}
+
+	.y {
+		left: calc(50% + var(--x));
+		top: 0;
+		bottom: 0;
+		width: 1px;
+		transform: translateX(-50%);
 	}
 
 	footer {
