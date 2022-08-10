@@ -2,38 +2,85 @@
 	import { onMount } from 'svelte'
 
 	import type Node from '$lib/node'
+	import type Tool from '$lib/tool'
+	import view from '$lib/view/store'
 	import MetaImage from '../components/Meta/Image.svelte'
 	import MetaTitle from '../components/Meta/Title.svelte'
 	import MetaDescription from '../components/Meta/Description.svelte'
 	import NodeElement from '../components/Node.svelte'
+	import ToolButton from '../components/Tool.svelte'
 
 	let nodes: Node[] = []
-	let tool: 'pointer' | 'arrow' | 'node' | 'delete' = 'pointer'
+	let center = { x: 0, y: 0 }
+
+	let tool: Tool = 'pointer'
+
+	let dragging = false
+
+	const onMouseDown = () => {
+		if (tool !== 'pointer') return
+		dragging = true
+	}
+
+	const onMouseMove = ({ movementX: x, movementY: y }: MouseEvent) => {
+		if (!dragging) return
+		center = { x: center.x + x, y: center.y - y }
+	}
+
+	const onMouseUp = () => {
+		dragging = false
+	}
+
+	const onClick = ({ offsetX: x, offsetY: y }: MouseEvent) => {
+		if (!($view && tool === 'node')) return
+
+		nodes = [
+			...nodes,
+			{
+				x: x - $view.width / 2 - center.x,
+				y: -y + $view.height / 2 - center.y,
+				name: 'Variable',
+				color: 'red'
+			}
+		]
+	}
 
 	onMount(() => {
-		Object.defineProperty(window, 'nodes', { get: () => nodes })
+		Object.defineProperty(window, 'nodes', {
+			get: () => nodes,
+			set: (newNodes: Node[]) => (nodes = newNodes),
+			configurable: true
+		})
+
+		return () => {
+			delete (window as { nodes?: Node[] }).nodes
+		}
 	})
 </script>
+
+<svelte:body on:mousemove={onMouseMove} on:mouseup={onMouseUp} />
+
+<svelte:head>
+	<svg>
+		<defs>
+			<marker
+				id="arrow"
+				viewBox="0 0 10 10"
+				refX={5}
+				refY={5}
+				markerWidth={6}
+				markerHeight={6}
+				orient="auto-start-reverse"
+			>
+				<path d="M 0 0 L 10 5 L 0 10 z" />
+			</marker>
+		</defs>
+	</svg>
+</svelte:head>
 
 <MetaImage />
 <MetaTitle />
 <MetaDescription />
-
-<svg>
-	<defs>
-		<marker
-			id="arrow"
-			viewBox="0 0 10 10"
-			refX={5}
-			refY={5}
-			markerWidth={6}
-			markerHeight={6}
-			orient="auto-start-reverse"
-		>
-			<path d="M 0 0 L 10 5 L 0 10 z" />
-		</marker>
-	</defs>
-</svg>
 
 <header>
 	<span class="hamburger">☰</span>
@@ -42,14 +89,16 @@
 		<span class="styles">Styles</span>
 	</div>
 </header>
-{#each nodes as node}
-	<NodeElement bind:node />
-{/each}
+<main on:mousedown={onMouseDown} on:click={onClick}>
+	{#each nodes as node}
+		<NodeElement bind:node {center} />
+	{/each}
+</main>
 <footer>
-	<button on:click={() => (tool = 'pointer')}>☝</button>
-	<button on:click={() => (tool = 'node')}>⬤</button>
-	<button on:click={() => (tool = 'arrow')}>↗</button>
-	<button on:click={() => (tool = 'delete')}>🗑️</button>
+	<ToolButton thisTool="pointer" bind:tool>☝</ToolButton>
+	<ToolButton thisTool="node" bind:tool>⬤</ToolButton>
+	<ToolButton thisTool="arrow" bind:tool>↗</ToolButton>
+	<ToolButton thisTool="delete" bind:tool>🗑️</ToolButton>
 </footer>
 
 <style lang="scss">
@@ -61,6 +110,16 @@
 		top: 1rem;
 		left: 1rem;
 		right: 1rem;
+		z-index: 100;
+	}
+
+	main {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 0;
 	}
 
 	footer {
@@ -68,8 +127,17 @@
 		justify-content: center;
 		align-items: center;
 		position: absolute;
+		left: 50%;
 		bottom: 1rem;
-		left: 1rem;
-		right: 1rem;
+		padding: 0.5rem 1rem;
+		background: white;
+		border-radius: 0.5rem;
+		box-shadow: 0 0 20px 5px rgba(black, 0.1);
+		transform: translateX(-50%);
+		z-index: 100;
+
+		> :global(button + button) {
+			margin-left: 1rem;
+		}
 	}
 </style>

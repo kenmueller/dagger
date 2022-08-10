@@ -1,6 +1,6 @@
-export default interface Node {
+import type Position from '$lib/position'
+
+export default interface Node extends Position {
 	name: string
 	color: string
-	x: number
-	y: number
 }

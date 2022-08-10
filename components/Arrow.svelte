@@ -4,10 +4,11 @@
 
 	export let arrow: Arrow
 
-	const dist = Math.sqrt(
+	$: dist = Math.sqrt(
 		(arrow.to.x - arrow.from.x) ** 2 + (arrow.to.y - arrow.from.y) ** 2
 	)
-	const to = {
+
+	$: to = {
 		x: arrow.to.x - ((arrow.to.x - arrow.from.x) * NODE_RADIUS) / dist,
 		y: arrow.to.y - ((arrow.to.y - arrow.from.y) * NODE_RADIUS) / dist
 	}

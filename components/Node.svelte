@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type Position from '$lib/position'
 	import type Node from '$lib/node'
 	import NODE_RADIUS from '$lib/node/radius'
 	import toRef from '$lib/ref/to'
@@ -8,6 +9,7 @@
 	const latexRef = toRef(latex)
 
 	export let node: Node
+	export let center: Position
 
 	let input: HTMLInputElement | null = null
 	$: input?.focus()
@@ -36,26 +38,19 @@
 		if (input && input !== target) editing = false
 	}
 
-	let mouse: { x: number; y: number } | null = null
+	let dragging = false
 
-	const onMouseDown = ({ clientX: x, clientY: y }: MouseEvent) => {
-		mouse = { x, y }
+	const onMouseDown = () => {
+		dragging = true
 	}
 
-	const onMouseMove = ({ clientX: x, clientY: y }: MouseEvent) => {
-		if (!mouse) return
-
-		node = {
-			...node,
-			x: node.x + (x - mouse.x),
-			y: node.y - (y - mouse.y)
-		}
-
-		mouse = { x, y }
+	const onMouseMove = ({ movementX: x, movementY: y }: MouseEvent) => {
+		if (!dragging) return
+		node = { ...node, x: node.x + x, y: node.y - y }
 	}
 
 	const onMouseUp = () => {
-		mouse = null
+		dragging = false
 	}
 </script>
 
@@ -68,10 +63,12 @@
 <div
 	class="outer"
 	style="
-		--color: {node.color};
 		--x: {node.x}px;
 		--y: {node.y}px;
+		--center-x: {center.x}px;
+		--center-y: {center.y}px;
 		--radius: {NODE_RADIUS}px;
+		--color: {node.color};
 	"
 	on:mousedown={onMouseDown}
 >
@@ -103,12 +100,13 @@
 
 	.outer {
 		position: absolute;
-		left: calc(50vw + var(--x));
-		top: calc(50vh - var(--y));
+		left: calc(50vw + var(--x) + var(--center-x));
+		top: calc(50vh - var(--y) - var(--center-y));
 		width: calc(2 * var(--radius));
 		height: calc(2 * var(--radius));
 		background: var(--color);
 		border-radius: 50%;
+		transform: translate(-50%, -50%);
 	}
 
 	.inner {
