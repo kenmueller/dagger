@@ -19,9 +19,7 @@
 	$: result = latexRef(node.name)
 
 	const edit = (event: MouseEvent) => {
-		// Prevent `blurWithClick` from immediately blurring the input
-		if (!editing) event.stopPropagation()
-
+		event.stopPropagation()
 		editing = true
 	}
 
@@ -40,7 +38,8 @@
 
 	let dragging = false
 
-	const onMouseDown = () => {
+	const onMouseDown = (event: MouseEvent) => {
+		event.stopPropagation()
 		dragging = true
 	}
 
