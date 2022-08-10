@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type Node from '$lib/node'
+	import NODE_RADIUS from '$lib/node/radius'
 	import toRef from '$lib/ref/to'
 	import latex from '$lib/latex'
 	import CenteredInput from './Input/Centered.svelte'
@@ -16,7 +17,9 @@
 	$: result = latexRef(node.name)
 
 	const edit = (event: MouseEvent) => {
+		// Prevent `blurWithClick` from immediately blurring the input
 		if (!editing) event.stopPropagation()
+
 		editing = true
 	}
 
@@ -64,7 +67,12 @@
 
 <div
 	class="outer"
-	style="--color: {node.color}; --x: {node.x}px; --y: {node.y}px;"
+	style="
+		--color: {node.color};
+		--x: {node.x}px;
+		--y: {node.y}px;
+		--radius: {NODE_RADIUS}px;
+	"
 	on:mousedown={onMouseDown}
 >
 	<div class="inner">
@@ -76,7 +84,7 @@
 				on:input={onInput}
 			/>
 		{/if}
-		<p on:click={edit}>
+		<p class:editable={!editing} on:click={edit}>
 			{#if !node.name}
 				<span class="placeholder">Rendered LaTeX</span>
 			{:else if result.error}
@@ -93,14 +101,12 @@
 		@import 'katex/dist/katex';
 	}
 
-	$radius: 15px;
-
 	.outer {
 		position: absolute;
 		left: calc(50vw + var(--x));
 		top: calc(50vh - var(--y));
-		width: $radius * 2;
-		height: $radius * 2;
+		width: calc(2 * var(--radius));
+		height: calc(2 * var(--radius));
 		background: var(--color);
 		border-radius: 50%;
 	}
@@ -111,7 +117,7 @@
 		align-items: center;
 		position: absolute;
 		left: 50%;
-		bottom: $radius * 2 + 5px;
+		bottom: calc(5px + 2 * var(--radius));
 		transform: translateX(-50%);
 	}
 
@@ -129,6 +135,10 @@
 		height: 1.44rem;
 		margin-top: 0.3rem;
 		text-align: center;
+	}
+
+	.editable {
+		cursor: pointer;
 	}
 
 	.placeholder {

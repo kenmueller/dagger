@@ -36,6 +36,8 @@
 	}
 
 	body {
+		user-select: none;
+		touch-action: none;
 		overflow: hidden;
 		font-family: font.$family;
 	}
