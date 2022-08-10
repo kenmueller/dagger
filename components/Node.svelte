@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type Position from '$lib/position'
 	import type Node from '$lib/node'
+	import type Tool from '$lib/tool'
 	import NODE_RADIUS from '$lib/node/radius'
 	import toRef from '$lib/ref/to'
 	import latex from '$lib/latex'
@@ -10,6 +11,7 @@
 
 	export let node: Node
 	export let center: Position
+	export let tool: Tool
 
 	let input: HTMLInputElement | null = null
 	$: input?.focus()
@@ -39,6 +41,8 @@
 	let dragging = false
 
 	const onMouseDown = (event: MouseEvent) => {
+		if (tool === 'delete') return
+
 		event.stopPropagation()
 		dragging = true
 	}
@@ -70,6 +74,7 @@
 		--color: {node.color};
 	"
 	on:mousedown={onMouseDown}
+	on:click
 >
 	<div class="inner">
 		{#if editing}

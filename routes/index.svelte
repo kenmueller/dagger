@@ -31,7 +31,7 @@
 		dragging = false
 	}
 
-	const onClick = ({ clientX: x, clientY: y }: MouseEvent) => {
+	const onLayoutClick = ({ clientX: x, clientY: y }: MouseEvent) => {
 		if (!($view && tool === 'node')) return
 
 		nodes = [
@@ -43,6 +43,15 @@
 				color: 'red'
 			}
 		]
+	}
+
+	const onNodeClick = (node: Node) => {
+		if (tool !== 'delete') return
+
+		const nodeIndex = nodes.indexOf(node)
+		if (nodeIndex < 0) return
+
+		nodes = nodes.filter((_node, index) => index !== nodeIndex)
 	}
 
 	onMount(() => {
@@ -85,11 +94,11 @@
 <header>
 	<span class="styles">Styles</span>
 </header>
-<main on:mousedown={onMouseDown} on:click={onClick}>
+<main on:mousedown={onMouseDown} on:click={onLayoutClick}>
 	<span class="x" style="--y: {center.y}px;" />
 	<span class="y" style="--x: {center.x}px;" />
 	{#each nodes as node}
-		<NodeElement bind:node {center} />
+		<NodeElement bind:node {center} {tool} on:click={() => onNodeClick(node)} />
 	{/each}
 </main>
 <footer>
