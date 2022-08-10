@@ -74,7 +74,7 @@
 		--color: {node.color};
 	"
 	on:mousedown={onMouseDown}
-	on:click
+	on:click|stopPropagation
 >
 	<div class="inner">
 		{#if editing}
