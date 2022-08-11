@@ -26,12 +26,12 @@
 	}
 
 	const onInput = ({ target }: Event) => {
-		const name = (target as HTMLInputElement | null)?.value
-		if (!name) return
+		const input = target as HTMLInputElement | null
+		if (!input) return
 
 		$nodes = {
 			...$nodes,
-			[id]: { ...node, name }
+			[id]: { ...node, name: input.value }
 		}
 	}
 
