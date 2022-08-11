@@ -3,11 +3,22 @@
 	import currentTool from '$lib/tool/current'
 
 	export let tool: Tool
+	export let key: string
+
+	const setTool = () => {
+		$currentTool = tool
+	}
+
+	const onKeyDown = ({ key: currentKey }: KeyboardEvent) => {
+		if (key === currentKey) setTool()
+	}
 </script>
+
+<svelte:window on:keydown={onKeyDown} />
 
 <button
 	aria-current={$currentTool === tool ? 'true' : undefined}
-	on:click={() => ($currentTool = tool)}
+	on:click={setTool}
 >
 	<slot />
 </button>

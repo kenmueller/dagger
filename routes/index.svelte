@@ -126,10 +126,10 @@
 	{/if}
 </main>
 <footer>
-	<ToolButton tool="pointer">☝</ToolButton>
-	<ToolButton tool="node">⬤</ToolButton>
-	<ToolButton tool="arrow">↗</ToolButton>
-	<ToolButton tool="delete">🗑️</ToolButton>
+	<ToolButton tool="pointer" key="1">☝</ToolButton>
+	<ToolButton tool="node" key="2">⬤</ToolButton>
+	<ToolButton tool="arrow" key="3">↗</ToolButton>
+	<ToolButton tool="delete" key="4">🗑️</ToolButton>
 </footer>
 
 <style lang="scss">
