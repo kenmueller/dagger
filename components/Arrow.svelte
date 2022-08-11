@@ -8,7 +8,7 @@
 	export let arrow: Arrow<Position>
 	export let padding = true
 
-	$: radius = padding ? NODE_RADIUS : 0
+	$: radius = padding ? NODE_RADIUS + 5 : 0
 	$: distance = Math.sqrt(
 		(arrow.to.x - arrow.from.x) ** 2 + (arrow.to.y - arrow.from.y) ** 2
 	)
