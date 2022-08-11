@@ -2,40 +2,59 @@
 	import type Arrow from '$lib/arrow'
 	import type Position from '$lib/position'
 	import NODE_RADIUS from '$lib/node/radius'
+	import arrows from '$lib/arrow/arrows'
 	import view from '$lib/view/store'
 	import center from '$lib/center'
+	import currentTool from '$lib/tool/current'
 
-	export let arrow: Arrow<Position>
+	export let arrow: Arrow<string> | null = null
+	export let position: Arrow<Position>
+
 	export let padding = true
 
 	$: radius = padding ? NODE_RADIUS + 5 : 0
+
 	$: distance = Math.sqrt(
-		(arrow.to.x - arrow.from.x) ** 2 + (arrow.to.y - arrow.from.y) ** 2
+		(position.to.x - position.from.x) ** 2 +
+			(position.to.y - position.from.y) ** 2
 	)
 
 	$: from = $view && {
-		x: $view.width / 2 + arrow.from.x + $center.x,
-		y: $view.height / 2 - arrow.from.y - $center.y
+		x: $view.width / 2 + position.from.x + $center.x,
+		y: $view.height / 2 - position.from.y - $center.y
 	}
 
 	$: to = $view && {
-		x:
-			$view.width / 2 +
-			(arrow.to.x - ((arrow.to.x - arrow.from.x) * radius) / distance) +
-			$center.x,
-		y:
-			$view.height / 2 -
-			(arrow.to.y - ((arrow.to.y - arrow.from.y) * radius) / distance) -
-			$center.y
+		x: $view.width / 2 + position.to.x + $center.x,
+		y: $view.height / 2 - position.to.y - $center.y
+	}
+
+	$: toPadding = {
+		x: ((position.to.x - position.from.x) * radius) / distance,
+		y: ((position.to.y - position.from.y) * radius) / distance
+	}
+
+	$: toWithPadding = to && {
+		x: to.x - toPadding.x,
+		y: to.y + toPadding.y
+	}
+
+	const onMouseDown = () => {
+		if ($currentTool !== 'delete') return
+
+		$arrows = $arrows.filter(
+			otherArrow =>
+				!(arrow && arrow.from === otherArrow.from && arrow.to === otherArrow.to)
+		)
 	}
 </script>
 
-{#if from && to}
+{#if from && to && toWithPadding}
 	<line
 		x1={from.x}
 		y1={from.y}
-		x2={to.x}
-		y2={to.y}
+		x2={toWithPadding.x}
+		y2={toWithPadding.y}
 		stroke="black"
 		stroke-width={2}
 		marker-end="url(#arrow)"
@@ -46,8 +65,8 @@
 		x2={to.x}
 		y2={to.y}
 		stroke="blue"
-		stroke-width={5}
-		marker-end="url(#arrow)"
+		stroke-width={20}
 		opacity={0}
+		on:mousedown={onMouseDown}
 	/>
 {/if}

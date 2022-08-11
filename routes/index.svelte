@@ -110,12 +110,15 @@
 					<path d="M 0 0 L 10 5 L 0 10 z" />
 				</marker>
 			</defs>
-			{#each $arrows as { from, to }}
-				<ArrowElement arrow={{ from: $nodes[from], to: $nodes[to] }} />
+			{#each $arrows as arrow}
+				<ArrowElement
+					{arrow}
+					position={{ from: $nodes[arrow.from], to: $nodes[arrow.to] }}
+				/>
 			{/each}
 			{#if $currentArrow && $mouse}
 				<ArrowElement
-					arrow={{ from: $nodes[$currentArrow], to: $mouse.position }}
+					position={{ from: $nodes[$currentArrow], to: $mouse.position }}
 					padding={false}
 				/>
 			{/if}
