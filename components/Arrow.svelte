@@ -6,8 +6,10 @@
 	import center from '$lib/center'
 
 	export let arrow: Arrow<Position>
+	export let padding = true
 
-	$: dist = Math.sqrt(
+	$: radius = padding ? NODE_RADIUS : 0
+	$: distance = Math.sqrt(
 		(arrow.to.x - arrow.from.x) ** 2 + (arrow.to.y - arrow.from.y) ** 2
 	)
 
@@ -19,11 +21,11 @@
 	$: to = $view && {
 		x:
 			$view.width / 2 +
-			(arrow.to.x - ((arrow.to.x - arrow.from.x) * NODE_RADIUS) / dist) +
+			(arrow.to.x - ((arrow.to.x - arrow.from.x) * radius) / distance) +
 			$center.x,
 		y:
 			$view.height / 2 -
-			(arrow.to.y - ((arrow.to.y - arrow.from.y) * NODE_RADIUS) / dist) -
+			(arrow.to.y - ((arrow.to.y - arrow.from.y) * radius) / distance) -
 			$center.y
 	}
 </script>

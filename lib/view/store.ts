@@ -1,5 +1,6 @@
-import { browser } from '$app/env'
 import { readable } from 'svelte/store'
+
+import { browser } from '$app/env'
 
 import type View from '.'
 

@@ -4,8 +4,10 @@
 	import type Node from '$lib/node'
 	import type Arrow from '$lib/arrow'
 	import view from '$lib/view/store'
+	import mouse from '$lib/mouse/store'
 	import nodes from '$lib/node/nodes'
 	import arrows from '$lib/arrow/arrows'
+	import currentArrow from '$lib/arrow/current'
 	import center from '$lib/center'
 	import currentTool from '$lib/tool/current'
 	import nextId from '$lib/id'
@@ -18,19 +20,19 @@
 
 	let dragging = false
 
-	const onMouseDown = ({ clientX: x, clientY: y }: MouseEvent) => {
+	const onMouseDown = () => {
 		switch ($currentTool) {
 			case 'pointer':
 				dragging = true
 				break
 			case 'node':
-				if (!$view) break
+				if (!$mouse) break
 
 				$nodes = {
 					...$nodes,
 					[nextId()]: {
-						x: x - $view.width / 2 - $center.x,
-						y: -y + $view.height / 2 - $center.y,
+						x: $mouse.position.x,
+						y: $mouse.position.y,
 						name: 'Variable',
 						color: 'red'
 					}
@@ -40,23 +42,24 @@
 		}
 	}
 
-	const onMouseMove = ({ movementX: x, movementY: y }: MouseEvent) => {
-		if (!dragging) return
-		$center = { x: $center.x + x, y: $center.y - y }
+	const onMouseMove = () => {
+		if (!(dragging && $mouse)) return
+
+		$center = {
+			x: $center.x + $mouse.movement.x,
+			y: $center.y + $mouse.movement.y
+		}
 	}
 
 	const onMouseUp = () => {
-		dragging = false
-	}
-
-	const onNodeClick = (id: string) => {
-		if ($currentTool !== 'delete') return
-
-		const newNodes = { ...$nodes }
-		delete newNodes[id]
-
-		$nodes = newNodes
-		$arrows = $arrows.filter(({ from, to }) => !(from === id || to === id))
+		switch ($currentTool) {
+			case 'pointer':
+				dragging = false
+				break
+			case 'arrow':
+				$currentArrow = null
+				break
+		}
 	}
 
 	onMount(() => {
@@ -92,7 +95,7 @@
 	<span class="x" style="--y: {$center.y}px;" />
 	<span class="y" style="--x: {$center.x}px;" />
 	{#each Object.entries($nodes) as [id, node] (id)}
-		<NodeElement {id} {node} on:click={() => onNodeClick(id)} />
+		<NodeElement {id} {node} />
 	{/each}
 	{#if $view}
 		<svg class="arrows" viewBox="0 0 {$view.width} {$view.height}">
@@ -112,6 +115,12 @@
 			{#each $arrows as { from, to }}
 				<ArrowElement arrow={{ from: $nodes[from], to: $nodes[to] }} />
 			{/each}
+			{#if $currentArrow && $mouse}
+				<ArrowElement
+					arrow={{ from: $nodes[$currentArrow], to: $mouse.position }}
+					padding={false}
+				/>
+			{/if}
 		</svg>
 	{/if}
 </main>

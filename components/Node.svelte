@@ -3,7 +3,10 @@
 	import NODE_RADIUS from '$lib/node/radius'
 	import toRef from '$lib/ref/to'
 	import latex from '$lib/latex'
+	import mouse from '$lib/mouse/store'
 	import nodes from '$lib/node/nodes'
+	import arrows from '$lib/arrow/arrows'
+	import currentArrow from '$lib/arrow/current'
 	import center from '$lib/center'
 	import currentTool from '$lib/tool/current'
 	import CenteredInput from './Input/Centered.svelte'
@@ -46,23 +49,61 @@
 	let dragging = false
 
 	const onMouseDown = (event: MouseEvent) => {
-		if ($currentTool === 'delete') return
+		switch ($currentTool) {
+			case 'arrow':
+				$currentArrow = id
+				break
+			case 'delete': {
+				const newNodes = { ...$nodes }
+				delete newNodes[id]
 
-		event.stopPropagation()
-		dragging = true
+				$nodes = newNodes
+				$arrows = $arrows.filter(({ from, to }) => !(from === id || to === id))
+
+				break
+			}
+			default:
+				event.stopPropagation()
+				dragging = true
+		}
 	}
 
-	const onMouseMove = ({ movementX: x, movementY: y }: MouseEvent) => {
-		if (!dragging) return
+	const onMouseMove = () => {
+		if (!(dragging && $mouse)) return
 
 		$nodes = {
 			...$nodes,
-			[id]: { ...node, x: node.x + x, y: node.y - y }
+			[id]: {
+				...node,
+				x: node.x + $mouse.movement.x,
+				y: node.y + $mouse.movement.y
+			}
 		}
 	}
 
 	const onMouseUp = () => {
 		dragging = false
+	}
+
+	const onNodeMouseUp = (event: MouseEvent) => {
+		if (!($currentTool === 'arrow' && $currentArrow)) return
+
+		event.stopPropagation()
+
+		if (
+			id === $currentArrow ||
+			$arrows.some(
+				({ from, to }) =>
+					(from === $currentArrow && to === id) ||
+					(from === id && to === $currentArrow)
+			)
+		) {
+			$currentArrow = null
+			return
+		}
+
+		$arrows = [...$arrows, { from: $currentArrow, to: id }]
+		$currentArrow = null
 	}
 </script>
 
@@ -83,6 +124,7 @@
 		--color: {node.color};
 	"
 	on:mousedown={onMouseDown}
+	on:mouseup={onNodeMouseUp}
 	on:click|stopPropagation
 >
 	<div class="inner">
