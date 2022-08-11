@@ -3,6 +3,8 @@
 
 	import type Node from '$lib/node'
 	import type Arrow from '$lib/arrow'
+	import GRID_SPACING from '$lib/grid/spacing'
+	import roundToNearest from '$lib/round/nearest'
 	import view from '$lib/view/store'
 	import mouse from '$lib/mouse/store'
 	import nodes from '$lib/node/nodes'
@@ -31,8 +33,8 @@
 				$nodes = {
 					...$nodes,
 					[nextId()]: {
-						x: $mouse.position.x,
-						y: $mouse.position.y,
+						x: roundToNearest($mouse.position.x, GRID_SPACING),
+						y: roundToNearest($mouse.position.y, GRID_SPACING),
 						name: 'Variable',
 						color: 'red'
 					}

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type Node from '$lib/node'
 	import NODE_RADIUS from '$lib/node/radius'
+	import GRID_SPACING from '$lib/grid/spacing'
+	import roundToNearest from '$lib/round/nearest'
 	import toRef from '$lib/ref/to'
 	import latex from '$lib/latex'
 	import mouse from '$lib/mouse/store'
@@ -82,6 +84,17 @@
 	}
 
 	const onMouseUp = () => {
+		if (!dragging) return
+
+		$nodes = {
+			...$nodes,
+			[id]: {
+				...node,
+				x: roundToNearest(node.x, GRID_SPACING),
+				y: roundToNearest(node.y, GRID_SPACING)
+			}
+		}
+
 		dragging = false
 	}
 
