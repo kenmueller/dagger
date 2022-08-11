@@ -18,9 +18,26 @@
 
 	let dragging = false
 
-	const onMouseDown = () => {
-		if ($currentTool !== 'pointer') return
-		dragging = true
+	const onMouseDown = ({ clientX: x, clientY: y }: MouseEvent) => {
+		switch ($currentTool) {
+			case 'pointer':
+				dragging = true
+				break
+			case 'node':
+				if (!$view) break
+
+				$nodes = {
+					...$nodes,
+					[nextId()]: {
+						x: x - $view.width / 2 - $center.x,
+						y: -y + $view.height / 2 - $center.y,
+						name: 'Variable',
+						color: 'red'
+					}
+				}
+
+				break
+		}
 	}
 
 	const onMouseMove = ({ movementX: x, movementY: y }: MouseEvent) => {
@@ -30,20 +47,6 @@
 
 	const onMouseUp = () => {
 		dragging = false
-	}
-
-	const onLayoutClick = ({ clientX: x, clientY: y }: MouseEvent) => {
-		if (!($view && $currentTool === 'node')) return
-
-		$nodes = {
-			...$nodes,
-			[nextId()]: {
-				x: x - $view.width / 2 - $center.x,
-				y: -y + $view.height / 2 - $center.y,
-				name: 'Variable',
-				color: 'red'
-			}
-		}
 	}
 
 	const onNodeClick = (id: string) => {
@@ -85,7 +88,7 @@
 <header>
 	<span class="styles">Styles</span>
 </header>
-<main on:mousedown={onMouseDown} on:click={onLayoutClick}>
+<main on:mousedown={onMouseDown}>
 	<span class="x" style="--y: {$center.y}px;" />
 	<span class="y" style="--x: {$center.x}px;" />
 	{#each Object.entries($nodes) as [id, node] (id)}
