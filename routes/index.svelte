@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
+	import copy from 'copy-to-clipboard'
 
 	import type Node from '$lib/node'
 	import type Arrow from '$lib/arrow'
 	import GRID_SPACING from '$lib/grid/spacing'
+	import _exportDocument from '$lib/export'
 	import roundToNearest from '$lib/round/nearest'
 	import view from '$lib/view/store'
 	import mouse from '$lib/mouse/store'
@@ -19,6 +21,11 @@
 	import NodeElement from '../components/Node.svelte'
 	import ArrowElement from '../components/Arrow.svelte'
 	import ToolButton from '../components/Tool.svelte'
+
+	const exportDocument = () => {
+		copy(_exportDocument($nodes, $arrows))
+		alert('Copied TikZ code to clipboard')
+	}
 
 	let dragging = false
 
@@ -90,7 +97,7 @@
 <MetaTitle />
 <MetaDescription />
 
-<button class="export" on:click={() => alert('export')}>Export</button>
+<button class="export" on:click={exportDocument}>Export</button>
 <main on:mousedown={onMouseDown}>
 	<span class="x" style="--y: {$center.y}px;" />
 	<span class="y" style="--x: {$center.x}px;" />

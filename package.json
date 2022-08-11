@@ -21,6 +21,7 @@
 		"@typescript-eslint/eslint-plugin": "^5.33.0",
 		"@typescript-eslint/parser": "^5.33.0",
 		"autoprefixer": "^10.4.8",
+		"copy-to-clipboard": "^3.3.2",
 		"eslint": "^8.21.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-svelte3": "^4.0.0",
