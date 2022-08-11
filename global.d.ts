@@ -1,3 +1,3 @@
 /// <reference types="@sveltejs/kit" />
 
-module 'katex/dist/contrib/auto-render'
+module 'katex/dist/contrib/auto-render.js'

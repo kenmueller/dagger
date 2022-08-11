@@ -1,4 +1,4 @@
-import renderMathInElement from 'katex/dist/contrib/auto-render'
+import renderMathInElement from 'katex/dist/contrib/auto-render.js'
 
 const latex = (code: string) => {
 	try {
