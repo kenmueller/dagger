@@ -1,17 +1,17 @@
 <script lang="ts">
-	import type Position from '$lib/position'
 	import type Node from '$lib/node'
-	import type Tool from '$lib/tool'
 	import NODE_RADIUS from '$lib/node/radius'
 	import toRef from '$lib/ref/to'
 	import latex from '$lib/latex'
+	import nodes from '$lib/node/nodes'
+	import center from '$lib/center'
+	import currentTool from '$lib/tool/current'
 	import CenteredInput from './Input/Centered.svelte'
 
 	const latexRef = toRef(latex)
 
+	export let id: string
 	export let node: Node
-	export let center: Position
-	export let tool: Tool
 
 	let input: HTMLInputElement | null = null
 	$: input?.focus()
@@ -27,7 +27,12 @@
 
 	const onInput = ({ target }: Event) => {
 		const name = (target as HTMLInputElement | null)?.value
-		if (name) node = { ...node, name }
+		if (!name) return
+
+		$nodes = {
+			...$nodes,
+			[id]: { ...node, name }
+		}
 	}
 
 	const blurWithKey = ({ key }: KeyboardEvent) => {
@@ -41,7 +46,7 @@
 	let dragging = false
 
 	const onMouseDown = (event: MouseEvent) => {
-		if (tool === 'delete') return
+		if ($currentTool === 'delete') return
 
 		event.stopPropagation()
 		dragging = true
@@ -49,7 +54,11 @@
 
 	const onMouseMove = ({ movementX: x, movementY: y }: MouseEvent) => {
 		if (!dragging) return
-		node = { ...node, x: node.x + x, y: node.y - y }
+
+		$nodes = {
+			...$nodes,
+			[id]: { ...node, x: node.x + x, y: node.y - y }
+		}
 	}
 
 	const onMouseUp = () => {
@@ -68,8 +77,8 @@
 	style="
 		--x: {node.x}px;
 		--y: {node.y}px;
-		--center-x: {center.x}px;
-		--center-y: {center.y}px;
+		--center-x: {$center.x}px;
+		--center-y: {$center.y}px;
 		--radius: {NODE_RADIUS}px;
 		--color: {node.color};
 	"
@@ -110,6 +119,7 @@
 		height: calc(2 * var(--radius));
 		background: var(--color);
 		border-radius: 50%;
+		z-index: 100;
 		transform: translate(-50%, -50%);
 	}
 

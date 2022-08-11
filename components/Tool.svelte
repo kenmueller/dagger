@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type Tool from '$lib/tool'
+	import currentTool from '$lib/tool/current'
 
-	export let thisTool: Tool
 	export let tool: Tool
 </script>
 
 <button
-	aria-current={tool === thisTool ? 'true' : undefined}
-	on:click={() => (tool = thisTool)}
+	aria-current={$currentTool === tool ? 'true' : undefined}
+	on:click={() => ($currentTool = tool)}
 >
 	<slot />
 </button>

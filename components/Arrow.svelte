@@ -1,23 +1,37 @@
 <script lang="ts">
 	import type Arrow from '$lib/arrow'
+	import type Position from '$lib/position'
 	import NODE_RADIUS from '$lib/node/radius'
+	import view from '$lib/view/store'
+	import center from '$lib/center'
 
-	export let arrow: Arrow
+	export let arrow: Arrow<Position>
 
 	$: dist = Math.sqrt(
 		(arrow.to.x - arrow.from.x) ** 2 + (arrow.to.y - arrow.from.y) ** 2
 	)
 
-	$: to = {
-		x: arrow.to.x - ((arrow.to.x - arrow.from.x) * NODE_RADIUS) / dist,
-		y: arrow.to.y - ((arrow.to.y - arrow.from.y) * NODE_RADIUS) / dist
+	$: from = $view && {
+		x: $view.width / 2 + arrow.from.x + $center.x,
+		y: $view.height / 2 - arrow.from.y - $center.y
+	}
+
+	$: to = $view && {
+		x:
+			$view.width / 2 +
+			(arrow.to.x - ((arrow.to.x - arrow.from.x) * NODE_RADIUS) / dist) +
+			$center.x,
+		y:
+			$view.height / 2 -
+			(arrow.to.y - ((arrow.to.y - arrow.from.y) * NODE_RADIUS) / dist) -
+			$center.y
 	}
 </script>
 
-<svg>
+{#if from && to}
 	<line
-		x1={arrow.from.x}
-		y1={arrow.from.y}
+		x1={from.x}
+		y1={from.y}
 		x2={to.x}
 		y2={to.y}
 		stroke="black"
@@ -25,8 +39,8 @@
 		marker-end="url(#arrow)"
 	/>
 	<line
-		x1={arrow.from.x}
-		y1={arrow.from.y}
+		x1={from.x}
+		y1={from.y}
 		x2={to.x}
 		y2={to.y}
 		stroke="blue"
@@ -34,4 +48,4 @@
 		marker-end="url(#arrow)"
 		opacity={0}
 	/>
-</svg>
+{/if}

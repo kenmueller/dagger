@@ -2,29 +2,30 @@
 	import { onMount } from 'svelte'
 
 	import type Node from '$lib/node'
-	import type Tool from '$lib/tool'
+	import type Arrow from '$lib/arrow'
 	import view from '$lib/view/store'
+	import nodes from '$lib/node/nodes'
+	import arrows from '$lib/arrow/arrows'
+	import center from '$lib/center'
+	import currentTool from '$lib/tool/current'
+	import nextId from '$lib/id'
 	import MetaImage from '../components/Meta/Image.svelte'
 	import MetaTitle from '../components/Meta/Title.svelte'
 	import MetaDescription from '../components/Meta/Description.svelte'
 	import NodeElement from '../components/Node.svelte'
+	import ArrowElement from '../components/Arrow.svelte'
 	import ToolButton from '../components/Tool.svelte'
-
-	let nodes: Node[] = []
-	let center = { x: 0, y: 0 }
-
-	let tool: Tool = 'pointer'
 
 	let dragging = false
 
 	const onMouseDown = () => {
-		if (tool !== 'pointer') return
+		if ($currentTool !== 'pointer') return
 		dragging = true
 	}
 
 	const onMouseMove = ({ movementX: x, movementY: y }: MouseEvent) => {
 		if (!dragging) return
-		center = { x: center.x + x, y: center.y - y }
+		$center = { x: $center.x + x, y: $center.y - y }
 	}
 
 	const onMouseUp = () => {
@@ -32,60 +33,50 @@
 	}
 
 	const onLayoutClick = ({ clientX: x, clientY: y }: MouseEvent) => {
-		if (!($view && tool === 'node')) return
+		if (!($view && $currentTool === 'node')) return
 
-		nodes = [
-			...nodes,
-			{
-				x: x - $view.width / 2 - center.x,
-				y: -y + $view.height / 2 - center.y,
+		$nodes = {
+			...$nodes,
+			[nextId()]: {
+				x: x - $view.width / 2 - $center.x,
+				y: -y + $view.height / 2 - $center.y,
 				name: 'Variable',
 				color: 'red'
 			}
-		]
+		}
 	}
 
-	const onNodeClick = (node: Node) => {
-		if (tool !== 'delete') return
+	const onNodeClick = (id: string) => {
+		if ($currentTool !== 'delete') return
 
-		const nodeIndex = nodes.indexOf(node)
-		if (nodeIndex < 0) return
+		const newNodes = { ...$nodes }
+		delete newNodes[id]
 
-		nodes = nodes.filter((_node, index) => index !== nodeIndex)
+		$nodes = newNodes
+		$arrows = $arrows.filter(({ from, to }) => !(from === id || to === id))
 	}
 
 	onMount(() => {
 		Object.defineProperty(window, 'nodes', {
-			get: () => nodes,
-			set: (newNodes: Node[]) => (nodes = newNodes),
+			get: () => $nodes,
+			set: (newNodes: Record<string, Node>) => ($nodes = newNodes),
+			configurable: true
+		})
+
+		Object.defineProperty(window, 'arrows', {
+			get: () => $arrows,
+			set: (newArrows: Arrow<string>[]) => ($arrows = newArrows),
 			configurable: true
 		})
 
 		return () => {
-			delete (window as { nodes?: Node[] }).nodes
+			delete (window as { nodes?: Record<string, Node> }).nodes
+			delete (window as { arrows?: Arrow<string>[] }).arrows
 		}
 	})
 </script>
 
 <svelte:body on:mousemove={onMouseMove} on:mouseup={onMouseUp} />
-
-<svelte:head>
-	<svg>
-		<defs>
-			<marker
-				id="arrow"
-				viewBox="0 0 10 10"
-				refX={5}
-				refY={5}
-				markerWidth={6}
-				markerHeight={6}
-				orient="auto-start-reverse"
-			>
-				<path d="M 0 0 L 10 5 L 0 10 z" />
-			</marker>
-		</defs>
-	</svg>
-</svelte:head>
 
 <MetaImage />
 <MetaTitle />
@@ -95,17 +86,37 @@
 	<span class="styles">Styles</span>
 </header>
 <main on:mousedown={onMouseDown} on:click={onLayoutClick}>
-	<span class="x" style="--y: {center.y}px;" />
-	<span class="y" style="--x: {center.x}px;" />
-	{#each nodes as node}
-		<NodeElement bind:node {center} {tool} on:click={() => onNodeClick(node)} />
+	<span class="x" style="--y: {$center.y}px;" />
+	<span class="y" style="--x: {$center.x}px;" />
+	{#each Object.entries($nodes) as [id, node] (id)}
+		<NodeElement {id} {node} on:click={() => onNodeClick(id)} />
 	{/each}
+	{#if $view}
+		<svg class="arrows" viewBox="0 0 {$view.width} {$view.height}">
+			<defs>
+				<marker
+					id="arrow"
+					viewBox="0 0 10 10"
+					refX={5}
+					refY={5}
+					markerWidth={6}
+					markerHeight={6}
+					orient="auto-start-reverse"
+				>
+					<path d="M 0 0 L 10 5 L 0 10 z" />
+				</marker>
+			</defs>
+			{#each $arrows as { from, to }}
+				<ArrowElement arrow={{ from: $nodes[from], to: $nodes[to] }} />
+			{/each}
+		</svg>
+	{/if}
 </main>
 <footer>
-	<ToolButton thisTool="pointer" bind:tool>☝</ToolButton>
-	<ToolButton thisTool="node" bind:tool>⬤</ToolButton>
-	<ToolButton thisTool="arrow" bind:tool>↗</ToolButton>
-	<ToolButton thisTool="delete" bind:tool>🗑️</ToolButton>
+	<ToolButton tool="pointer">☝</ToolButton>
+	<ToolButton tool="node">⬤</ToolButton>
+	<ToolButton tool="arrow">↗</ToolButton>
+	<ToolButton tool="delete">🗑️</ToolButton>
 </footer>
 
 <style lang="scss">
@@ -130,9 +141,10 @@
 
 	.x,
 	.y {
+		pointer-events: none;
 		position: absolute;
 		background: rgba(black, 0.1);
-		z-index: 100;
+		z-index: 200;
 	}
 
 	.x {
@@ -149,6 +161,15 @@
 		bottom: 0;
 		width: 1px;
 		transform: translateX(-50%);
+	}
+
+	.arrows {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 0;
 	}
 
 	footer {
