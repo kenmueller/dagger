@@ -1,4 +1,4 @@
-import renderInElement from 'katex/dist/contrib/auto-render'
+import renderMathInElement from 'katex/dist/contrib/auto-render'
 
 const latex = (code: string) => {
 	try {
@@ -6,7 +6,7 @@ const latex = (code: string) => {
 
 		element.textContent = code
 
-		renderInElement(element, {
+		renderMathInElement(element, {
 			delimiters: [{ left: '$', right: '$', display: false }]
 		})
 
