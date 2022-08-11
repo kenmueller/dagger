@@ -88,9 +88,7 @@
 <MetaTitle />
 <MetaDescription />
 
-<header>
-	<span class="styles">Styles</span>
-</header>
+<button class="export" on:click={() => alert('export')}>Export</button>
 <main on:mousedown={onMouseDown}>
 	<span class="x" style="--y: {$center.y}px;" />
 	<span class="y" style="--x: {$center.x}px;" />
@@ -132,14 +130,17 @@
 </footer>
 
 <style lang="scss">
-	header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
+	.export {
 		position: absolute;
 		right: 1rem;
 		top: 1rem;
+		color: colors.$blue;
 		z-index: 100;
+		transition: opacity 0.3s;
+
+		&:hover {
+			opacity: 0.7;
+		}
 	}
 
 	main {
