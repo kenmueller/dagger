@@ -168,6 +168,7 @@
 <MetaDescription />
 
 <header>
+	<h1>Dagger</h1>
 	<button on:click={share}>Share</button>
 	<button on:click={exportDocument}>Export</button>
 </header>
@@ -224,18 +225,23 @@
 
 <style lang="scss">
 	header {
+		pointer-events: none;
 		position: absolute;
 		left: 1rem;
 		right: 1rem;
 		top: 1rem;
 		display: flex;
-		justify-content: flex-end;
-		align-items: center;
+		align-items: flex-start;
+		z-index: 100;
+	}
+
+	h1 {
+		margin: -0.2rem auto 0 0.2rem;
 	}
 
 	button {
+		pointer-events: all;
 		color: colors.$blue;
-		z-index: 100;
 		transition: opacity 0.3s;
 
 		&:hover {
