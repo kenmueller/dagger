@@ -17,7 +17,9 @@ ${Object.entries(nodes)
 			`\t\\node at (${[
 				nearestDivisor(node.x, GRID_SPACING),
 				nearestDivisor(node.y, GRID_SPACING)
-			].join(', ')}) (${id}) [label=above:{${node.name}}]{};`
+			].join(', ')}) (${id}) [label={[label distance=-3mm]above:{${
+				node.name
+			}}}]{};`
 	)
 	.join('\n')}
 ${arrows.map(arrow => `\t\\draw (${arrow.from}) -- (${arrow.to});`).join('\n')}
