@@ -9,7 +9,13 @@
 		$currentTool = tool
 	}
 
-	const onKeyDown = ({ key: currentKey }: KeyboardEvent) => {
+	const onKeyDown = ({ target, key: currentKey }: KeyboardEvent) => {
+		if (
+			target instanceof HTMLInputElement ||
+			target instanceof HTMLTextAreaElement
+		)
+			return
+
 		if (keys.includes(currentKey)) setTool()
 	}
 </script>
