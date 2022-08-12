@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { browser } from '$app/env'
+
 	import type Node from '$lib/node'
 	import NODE_RADIUS from '$lib/node/radius'
 	import GRID_SPACING from '$lib/grid/spacing'
@@ -25,7 +27,7 @@
 
 	let editing = false
 
-	$: result = latexRef(node.name)
+	$: result = browser ? latexRef(node.name) : null
 
 	const edit = (event: MouseEvent) => {
 		event.stopPropagation()
@@ -154,10 +156,14 @@
 		<p class:editable={!editing} on:click={edit}>
 			{#if !node.name}
 				<span class="placeholder">Rendered LaTeX</span>
-			{:else if result.error}
-				<span class="error">{result.error.message}</span>
+			{:else if result}
+				{#if result.error}
+					<span class="error">{result.error.message}</span>
+				{:else}
+					{@html result.value}
+				{/if}
 			{:else}
-				{@html result.value}
+				{node.name}
 			{/if}
 		</p>
 	</div>

@@ -52,6 +52,7 @@
 	import center from '$lib/center'
 	import currentTool from '$lib/tool/current'
 	import nextId from '$lib/id'
+	import nearestDivisor from '$lib/nearest/divisor'
 	import errorFromValue from '$lib/error/from/value'
 	import MetaImage from '../components/Meta/Image.svelte'
 	import MetaTitle from '../components/Meta/Title.svelte'
@@ -63,7 +64,6 @@
 	import NodeIcon from '../images/Node.svelte'
 	import ArrowIcon from '../images/Arrow.svelte'
 	import DeleteIcon from '../images/Trash.svelte'
-	import nearestDivisor from '$lib/nearest/divisor'
 
 	const share = () => {
 		copy(
@@ -84,6 +84,8 @@
 				$page.url
 			).href
 		)
+
+		alert('Copied graph URL to clipboard')
 	}
 
 	const exportDocument = () => {
