@@ -6,6 +6,7 @@
 	import view from '$lib/view/store'
 	import center from '$lib/center'
 	import currentTool from '$lib/tool/current'
+	import cursorHandler from '$lib/cursor/handler'
 
 	export let arrow: Arrow<string> | null = null
 	export let position: Arrow<Position>
@@ -39,14 +40,14 @@
 		y: to.y + toPadding.y
 	}
 
-	const onMouseDown = () => {
+	const onCursorDown = cursorHandler(() => {
 		if ($currentTool !== 'delete') return
 
 		$arrows = $arrows.filter(
 			otherArrow =>
 				!(arrow && arrow.from === otherArrow.from && arrow.to === otherArrow.to)
 		)
-	}
+	})
 </script>
 
 {#if from && to && toWithPadding}
@@ -67,6 +68,7 @@
 		stroke="blue"
 		stroke-width={20}
 		opacity={0}
-		on:mousedown={onMouseDown}
+		on:mousedown={onCursorDown}
+		on:touchstart={onCursorDown}
 	/>
 {/if}

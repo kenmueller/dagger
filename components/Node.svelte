@@ -5,9 +5,9 @@
 	import NODE_RADIUS from '$lib/node/radius'
 	import GRID_SPACING from '$lib/grid/spacing'
 	import roundToNearest from '$lib/nearest/round'
+	import cursorHandler from '$lib/cursor/handler'
 	import toRef from '$lib/ref/to'
 	import latex from '$lib/latex'
-	import mouse from '$lib/mouse/store'
 	import nodes from '$lib/node/nodes'
 	import arrows from '$lib/arrow/arrows'
 	import currentArrow from '$lib/arrow/current'
@@ -16,6 +16,7 @@
 	import CenteredInput from './Input/Centered.svelte'
 
 	import '../styles/katex.less'
+	import type Cursor from '$lib/cursor'
 
 	const latexRef = toRef(latex)
 
@@ -52,9 +53,9 @@
 		if (input && input !== target) editing = false
 	}
 
-	let dragging = false
+	let draggingCursor: Cursor | null = null
 
-	const onMouseDown = (event: MouseEvent) => {
+	const onCursorDown = cursorHandler((cursor, event) => {
 		switch ($currentTool) {
 			case 'arrow':
 				$currentArrow = id
@@ -70,25 +71,27 @@
 			}
 			default:
 				event.stopPropagation()
-				dragging = true
+				draggingCursor = cursor
 		}
-	}
+	})
 
-	const onMouseMove = () => {
-		if (!(dragging && $mouse)) return
+	const onCursorMove = cursorHandler(cursor => {
+		if (!draggingCursor) return
 
 		$nodes = {
 			...$nodes,
 			[id]: {
 				...node,
-				x: node.x + $mouse.movement.x,
-				y: node.y + $mouse.movement.y
+				x: node.x + (cursor.x - draggingCursor.x),
+				y: node.y - (cursor.y - draggingCursor.y)
 			}
 		}
-	}
 
-	const onMouseUp = () => {
-		if (!dragging) return
+		draggingCursor = cursor
+	})
+
+	const onCursorUp = cursorHandler(() => {
+		if (!draggingCursor) return
 
 		$nodes = {
 			...$nodes,
@@ -99,10 +102,10 @@
 			}
 		}
 
-		dragging = false
-	}
+		draggingCursor = null
+	})
 
-	const onNodeMouseUp = (event: MouseEvent) => {
+	const onNodeCursorUp = cursorHandler((_cursor, event) => {
 		if (!($currentTool === 'arrow' && $currentArrow)) return
 
 		event.stopPropagation()
@@ -121,14 +124,16 @@
 
 		$arrows = [...$arrows, { from: $currentArrow, to: id }]
 		$currentArrow = null
-	}
+	})
 </script>
 
 <svelte:window on:keyup={blurWithKey} />
 <svelte:body
 	on:click={blurWithClick}
-	on:mousemove={onMouseMove}
-	on:mouseup={onMouseUp} />
+	on:mousemove={onCursorMove}
+	on:touchmove={onCursorMove}
+	on:mouseup={onCursorUp}
+	on:touchend={onCursorUp} />
 
 <div
 	class="outer"
@@ -140,8 +145,10 @@
 		--radius: {NODE_RADIUS}px;
 		--color: {node.color};
 	"
-	on:mousedown={onMouseDown}
-	on:mouseup={onNodeMouseUp}
+	on:mousedown={onCursorDown}
+	on:touchstart={onCursorDown}
+	on:mouseup={onNodeCursorUp}
+	on:touchend={onNodeCursorUp}
 	on:click|stopPropagation
 >
 	<div class="inner">

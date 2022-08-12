@@ -44,11 +44,12 @@
 
 	import type Node from '$lib/node'
 	import type Arrow from '$lib/arrow'
+	import type Cursor from '$lib/cursor'
 	import GRID_SPACING from '$lib/grid/spacing'
 	import _exportDocument from '$lib/export'
 	import roundToNearest from '$lib/nearest/round'
 	import view from '$lib/view/store'
-	import mouse from '$lib/mouse/store'
+	import currentCursor from '$lib/cursor/current'
 	import nodes from '$lib/node/nodes'
 	import arrows from '$lib/arrow/arrows'
 	import currentArrow from '$lib/arrow/current'
@@ -56,6 +57,7 @@
 	import currentTool from '$lib/tool/current'
 	import getId from '$lib/id'
 	import nextId from '$lib/id/next'
+	import cursorHandler from '$lib/cursor/handler'
 	import nearestDivisor from '$lib/nearest/divisor'
 	import errorFromValue from '$lib/error/from/value'
 	import MetaImage from '../components/Meta/Image.svelte'
@@ -97,21 +99,21 @@
 		alert('Copied TikZ code to clipboard')
 	}
 
-	let dragging = false
+	let draggingCursor: Cursor | null = null
 
-	const onMouseDown = () => {
+	const onCursorDown = cursorHandler(cursor => {
 		switch ($currentTool) {
 			case 'pointer':
-				dragging = true
+				draggingCursor = cursor
 				break
 			case 'node':
-				if (!$mouse) break
+				if (!$currentCursor) break
 
 				$nodes = {
 					...$nodes,
 					[getId()]: {
-						x: roundToNearest($mouse.position.x, GRID_SPACING),
-						y: roundToNearest($mouse.position.y, GRID_SPACING),
+						x: roundToNearest($currentCursor.x, GRID_SPACING),
+						y: roundToNearest($currentCursor.y, GRID_SPACING),
 						name: 'Variable',
 						color: 'red'
 					}
@@ -119,27 +121,29 @@
 
 				break
 		}
-	}
+	})
 
-	const onMouseMove = () => {
-		if (!(dragging && $mouse)) return
+	const onCursorMove = cursorHandler(cursor => {
+		if (!draggingCursor) return
 
 		$center = {
-			x: $center.x + $mouse.movement.x,
-			y: $center.y + $mouse.movement.y
+			x: $center.x + (cursor.x - draggingCursor.x),
+			y: $center.y - (cursor.y - draggingCursor.y)
 		}
-	}
 
-	const onMouseUp = () => {
+		draggingCursor = cursor
+	})
+
+	const onCursorUp = cursorHandler(() => {
 		switch ($currentTool) {
 			case 'pointer':
-				dragging = false
+				draggingCursor = null
 				break
 			case 'arrow':
 				$currentArrow = null
 				break
 		}
-	}
+	})
 
 	onMount(() => {
 		Object.defineProperty(window, 'nodes', {
@@ -161,7 +165,11 @@
 	})
 </script>
 
-<svelte:body on:mousemove={onMouseMove} on:mouseup={onMouseUp} />
+<svelte:body
+	on:mousemove={onCursorMove}
+	on:touchmove={onCursorMove}
+	on:mouseup={onCursorUp}
+	on:touchend={onCursorUp} />
 
 <MetaImage />
 <MetaTitle />
@@ -172,7 +180,7 @@
 	<button on:click={share}>Share</button>
 	<button on:click={exportDocument}>Export</button>
 </header>
-<main on:mousedown={onMouseDown}>
+<main on:mousedown={onCursorDown} on:touchstart={onCursorDown}>
 	<span class="x" style="--y: {$center.y}px;" />
 	<span class="y" style="--x: {$center.x}px;" />
 	{#each Object.entries($nodes) as [id, node] (id)}
@@ -199,9 +207,9 @@
 					position={{ from: $nodes[arrow.from], to: $nodes[arrow.to] }}
 				/>
 			{/each}
-			{#if $currentArrow && $mouse}
+			{#if $currentArrow && $currentCursor}
 				<ArrowElement
-					position={{ from: $nodes[$currentArrow], to: $mouse.position }}
+					position={{ from: $nodes[$currentArrow], to: $currentCursor }}
 					padding={false}
 				/>
 			{/if}
