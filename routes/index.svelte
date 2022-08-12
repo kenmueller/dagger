@@ -21,6 +21,10 @@
 	import NodeElement from '../components/Node.svelte'
 	import ArrowElement from '../components/Arrow.svelte'
 	import ToolButton from '../components/Tool.svelte'
+	import PointerIcon from '../images/Pointer.svelte'
+	import NodeIcon from '../images/Node.svelte'
+	import ArrowIcon from '../images/Arrow.svelte'
+	import DeleteIcon from '../images/Trash.svelte'
 
 	const exportDocument = () => {
 		copy(_exportDocument($nodes, $arrows))
@@ -135,10 +139,18 @@
 	{/if}
 </main>
 <footer>
-	<ToolButton tool="pointer" key="1">☝</ToolButton>
-	<ToolButton tool="node" key="2">⬤</ToolButton>
-	<ToolButton tool="arrow" key="3">↗</ToolButton>
-	<ToolButton tool="delete" key="4">🗑️</ToolButton>
+	<ToolButton tool="pointer" keys={['1', 'a', 'j']}>
+		<PointerIcon />
+	</ToolButton>
+	<ToolButton tool="node" keys={['2', 's', 'k']}>
+		<NodeIcon />
+	</ToolButton>
+	<ToolButton tool="arrow" keys={['3', 'd', 'l']}>
+		<ArrowIcon />
+	</ToolButton>
+	<ToolButton tool="delete" keys={['4', 'f', ';']}>
+		<DeleteIcon />
+	</ToolButton>
 </footer>
 
 <style lang="scss">
@@ -198,13 +210,15 @@
 	}
 
 	footer {
+		$spacing: 0.5rem;
+
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		position: absolute;
 		left: 50%;
 		bottom: 1rem;
-		padding: 0.5rem 1rem;
+		padding: $spacing;
 		background: white;
 		border-radius: 0.5rem;
 		box-shadow: 0 0 20px 5px rgba(black, 0.1);
@@ -212,7 +226,7 @@
 		z-index: 100;
 
 		> :global(button + button) {
-			margin-left: 1rem;
+			margin-left: $spacing;
 		}
 	}
 </style>

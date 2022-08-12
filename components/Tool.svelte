@@ -3,14 +3,14 @@
 	import currentTool from '$lib/tool/current'
 
 	export let tool: Tool
-	export let key: string
+	export let keys: string[]
 
 	const setTool = () => {
 		$currentTool = tool
 	}
 
 	const onKeyDown = ({ key: currentKey }: KeyboardEvent) => {
-		if (key === currentKey) setTool()
+		if (keys.includes(currentKey)) setTool()
 	}
 </script>
 
@@ -24,7 +24,16 @@
 </button>
 
 <style lang="scss">
+	button {
+		padding: 0.5rem;
+		border-radius: 0.35rem;
+
+		> :global(svg) {
+			height: 1.4rem;
+		}
+	}
+
 	[aria-current] {
-		background: rgba(colors.$blue, 0.1);
+		background: rgba(colors.$blue, 0.2);
 	}
 </style>
