@@ -1,6 +1,43 @@
+<script lang="ts" context="module">
+	export const load: Load = ({ url }) => {
+		try {
+			const nodesString = url.searchParams.get('nodes')
+			const nodesValue = JSON.parse(nodesString || 'null') as
+				| [string, number, number, string, string][]
+				| null
+
+			if (nodesValue)
+				nodes.set(
+					Object.fromEntries(
+						nodesValue.map(([id, x, y, name, color]) => [
+							id,
+							{ x: x * GRID_SPACING, y: y * GRID_SPACING, name, color }
+						])
+					)
+				)
+
+			const arrowsString = url.searchParams.get('arrows')
+			const arrowsValue = JSON.parse(arrowsString || 'null') as
+				| [string, string][]
+				| null
+
+			if (arrowsValue)
+				arrows.set(arrowsValue.map(([from, to]) => ({ from, to })))
+
+			return {}
+		} catch (value) {
+			const { code, message } = errorFromValue(value)
+			return { status: code, body: message }
+		}
+	}
+</script>
+
 <script lang="ts">
+	import type { Load } from '@sveltejs/kit'
 	import { onMount } from 'svelte'
 	import copy from 'copy-to-clipboard'
+
+	import { page } from '$app/stores'
 
 	import type Node from '$lib/node'
 	import type Arrow from '$lib/arrow'
@@ -15,6 +52,7 @@
 	import center from '$lib/center'
 	import currentTool from '$lib/tool/current'
 	import nextId from '$lib/id'
+	import errorFromValue from '$lib/error/from/value'
 	import MetaImage from '../components/Meta/Image.svelte'
 	import MetaTitle from '../components/Meta/Title.svelte'
 	import MetaDescription from '../components/Meta/Description.svelte'
@@ -25,6 +63,28 @@
 	import NodeIcon from '../images/Node.svelte'
 	import ArrowIcon from '../images/Arrow.svelte'
 	import DeleteIcon from '../images/Trash.svelte'
+	import nearestDivisor from '$lib/nearest/divisor'
+
+	const share = () => {
+		copy(
+			new URL(
+				`/?nodes=${encodeURIComponent(
+					JSON.stringify(
+						Object.entries($nodes).map(([id, node]) => [
+							id,
+							nearestDivisor(node.x, GRID_SPACING),
+							nearestDivisor(node.y, GRID_SPACING),
+							node.name,
+							node.color
+						])
+					)
+				)}&arrows=${encodeURIComponent(
+					JSON.stringify($arrows.map(({ from, to }) => [from, to]))
+				)}`,
+				$page.url
+			).href
+		)
+	}
 
 	const exportDocument = () => {
 		copy(_exportDocument($nodes, $arrows))
@@ -101,7 +161,10 @@
 <MetaTitle />
 <MetaDescription />
 
-<button class="export" on:click={exportDocument}>Export</button>
+<header>
+	<button on:click={share}>Share</button>
+	<button on:click={exportDocument}>Export</button>
+</header>
 <main on:mousedown={onMouseDown}>
 	<span class="x" style="--y: {$center.y}px;" />
 	<span class="y" style="--x: {$center.x}px;" />
@@ -154,16 +217,27 @@
 </footer>
 
 <style lang="scss">
-	.export {
+	header {
 		position: absolute;
+		left: 1rem;
 		right: 1rem;
 		top: 1rem;
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+	}
+
+	button {
 		color: colors.$blue;
 		z-index: 100;
 		transition: opacity 0.3s;
 
 		&:hover {
 			opacity: 0.7;
+		}
+
+		& + & {
+			margin-left: 1rem;
 		}
 	}
 
