@@ -2,7 +2,7 @@
 	import type Node from '$lib/node'
 	import NODE_RADIUS from '$lib/node/radius'
 	import GRID_SPACING from '$lib/grid/spacing'
-	import roundToNearest from '$lib/round/nearest'
+	import roundToNearest from '$lib/nearest/round'
 	import toRef from '$lib/ref/to'
 	import latex from '$lib/latex'
 	import mouse from '$lib/mouse/store'

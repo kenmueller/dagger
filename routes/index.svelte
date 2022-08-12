@@ -6,7 +6,7 @@
 	import type Arrow from '$lib/arrow'
 	import GRID_SPACING from '$lib/grid/spacing'
 	import _exportDocument from '$lib/export'
-	import roundToNearest from '$lib/round/nearest'
+	import roundToNearest from '$lib/nearest/round'
 	import view from '$lib/view/store'
 	import mouse from '$lib/mouse/store'
 	import nodes from '$lib/node/nodes'

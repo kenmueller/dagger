@@ -1,4 +1,6 @@
+import nearestDivisor from './divisor'
+
 const roundToNearest = (value: number, multiple: number) =>
-	Math.floor((value + multiple / 2) / multiple) * multiple
+	nearestDivisor(value, multiple) * multiple
 
 export default roundToNearest
