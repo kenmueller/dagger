@@ -12,7 +12,7 @@
 
 	export let padding = true
 
-	$: radius = padding ? NODE_RADIUS + 5 : 0
+	$: radius = (padding ? NODE_RADIUS : 0) + 5
 
 	$: distance = Math.sqrt(
 		(position.to.x - position.from.x) ** 2 +
