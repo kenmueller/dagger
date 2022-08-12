@@ -2,27 +2,30 @@
 	export const load: Load = ({ url }) => {
 		try {
 			const nodesString = url.searchParams.get('nodes')
-			const nodesValue = JSON.parse(nodesString || 'null') as
+			const nodesValue = (JSON.parse(nodesString || 'null') || []) as
 				| [string, number, number, string, string][]
-				| null
 
-			if (nodesValue)
-				nodes.set(
-					Object.fromEntries(
-						nodesValue.map(([id, x, y, name, color]) => [
-							id,
-							{ x: x * GRID_SPACING, y: y * GRID_SPACING, name, color }
-						])
-					)
-				)
+			const nodesMap = Object.fromEntries(
+				nodesValue.map(([id, x, y, name, color]) => [
+					id,
+					{ x: x * GRID_SPACING, y: y * GRID_SPACING, name, color }
+				])
+			)
+
+			nodes.set(nodesMap)
+
+			nextId.set(
+				Object.keys(nodesMap).reduce(
+					(max, id) => Math.max(max, Number.parseInt(id)),
+					-1
+				) + 1
+			)
 
 			const arrowsString = url.searchParams.get('arrows')
-			const arrowsValue = JSON.parse(arrowsString || 'null') as
+			const arrowsValue = (JSON.parse(arrowsString || 'null') || []) as
 				| [string, string][]
-				| null
 
-			if (arrowsValue)
-				arrows.set(arrowsValue.map(([from, to]) => ({ from, to })))
+			arrows.set(arrowsValue.map(([from, to]) => ({ from, to })))
 
 			return {}
 		} catch (value) {
@@ -51,7 +54,8 @@
 	import currentArrow from '$lib/arrow/current'
 	import center from '$lib/center'
 	import currentTool from '$lib/tool/current'
-	import nextId from '$lib/id'
+	import getId from '$lib/id'
+	import nextId from '$lib/id/next'
 	import nearestDivisor from '$lib/nearest/divisor'
 	import errorFromValue from '$lib/error/from/value'
 	import MetaImage from '../components/Meta/Image.svelte'
@@ -105,7 +109,7 @@
 
 				$nodes = {
 					...$nodes,
-					[nextId()]: {
+					[getId()]: {
 						x: roundToNearest($mouse.position.x, GRID_SPACING),
 						y: roundToNearest($mouse.position.y, GRID_SPACING),
 						name: 'Variable',
