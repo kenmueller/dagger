@@ -1,22 +1,15 @@
 import renderMathInElement from 'katex/dist/contrib/auto-render.js'
 
 const latex = (code: string) => {
-	try {
-		const element = document.createElement('div')
+	const element = document.createElement('div')
 
-		element.textContent = code
+	element.textContent = code
 
-		renderMathInElement(element, {
-			delimiters: [{ left: '$', right: '$', display: false }]
-		})
+	renderMathInElement(element, {
+		delimiters: [{ left: '$', right: '$', display: false }]
+	})
 
-		return element.innerHTML
-	} catch (error) {
-		if (error instanceof Error)
-			error.message = error.message.replace('KaTeX parse error: ', '')
-
-		throw error
-	}
+	return element.innerHTML
 }
 
 export default latex
