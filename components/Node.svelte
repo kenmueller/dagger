@@ -13,6 +13,8 @@
 	import currentTool from '$lib/tool/current'
 	import CenteredInput from './Input/Centered.svelte'
 
+	import '../styles/katex.less'
+
 	const latexRef = toRef(latex)
 
 	export let id: string
@@ -162,10 +164,6 @@
 </div>
 
 <style lang="scss">
-	:global {
-		@import 'katex/dist/katex';
-	}
-
 	.outer {
 		position: absolute;
 		left: calc(50% + var(--x) + var(--center-x));
