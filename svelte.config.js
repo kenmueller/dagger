@@ -34,6 +34,7 @@ const config = {
 			directives: {
 				'base-uri': ['self'],
 				'default-src': ['self'],
+				'script-src': ['self', 'unsafe-inline'],
 				'style-src': ['self', 'unsafe-inline']
 			}
 		}
