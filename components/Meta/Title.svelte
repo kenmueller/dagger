@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let value = 'Dagger'
+	export let value = 'DAG Monster'
 </script>
 
 <svelte:head>

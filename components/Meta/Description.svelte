@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let value = 'Dagger'
+	export let value = 'The simplest way to create a DAG and export into LaTeX'
 </script>
 
 <svelte:head>

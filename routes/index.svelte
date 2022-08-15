@@ -176,7 +176,7 @@
 <MetaDescription />
 
 <header>
-	<h1>Dagger</h1>
+	<h1>DAG Monster</h1>
 	<button on:click={share}>Share</button>
 	<button on:click={exportDocument}>Export</button>
 </header>

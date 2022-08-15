@@ -1,5 +1,5 @@
 {
-	"name": "dagger",
+	"name": "dagmonster",
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
@@ -18,11 +18,11 @@
 		"@sveltejs/kit": "next",
 		"@types/katex": "^0.14.0",
 		"@types/web-app-manifest": "^1.0.2",
-		"@typescript-eslint/eslint-plugin": "^5.33.0",
-		"@typescript-eslint/parser": "^5.33.0",
+		"@typescript-eslint/eslint-plugin": "^5.33.1",
+		"@typescript-eslint/parser": "^5.33.1",
 		"autoprefixer": "^10.4.8",
 		"copy-to-clipboard": "^3.3.2",
-		"eslint": "^8.21.0",
+		"eslint": "^8.22.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-svelte3": "^4.0.0",
 		"katex": "^0.16.0",

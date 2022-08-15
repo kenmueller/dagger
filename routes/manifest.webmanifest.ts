@@ -3,24 +3,24 @@ import type { WebAppManifest } from 'web-app-manifest'
 
 import errorFromValue from '$lib/error/from/value'
 
-// import touch from '../images/touch.png'
-// import mask from '../images/mask.png'
+import touch from '../images/touch.png'
+import mask from '../images/mask.png'
 
 const manifest: WebAppManifest = {
 	dir: 'ltr',
 	lang: 'en-US',
 	scope: '/',
 	start_url: '/',
-	name: 'Dagger',
-	short_name: 'Dagger',
-	description: 'Dagger',
+	name: 'DAG Monster',
+	short_name: 'DAG Monster',
+	description: 'The simplest way to create a DAG and export into LaTeX',
 	display: 'standalone',
 	theme_color: 'white',
 	background_color: 'white',
 	categories: ['education', 'productivity', 'utilities'],
 	icons: [
-		// { src: touch, sizes: '180x180' },
-		// { src: mask, sizes: '512x512', purpose: 'monochrome maskable' }
+		{ src: touch, sizes: '180x180' },
+		{ src: mask, sizes: '512x512', purpose: 'monochrome maskable' }
 	]
 }
 

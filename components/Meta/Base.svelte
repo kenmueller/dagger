@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores'
 
-	// import touch from '../../images/touch.png'
+	import touch from '../../images/touch.png'
 </script>
 
 <svelte:head>
@@ -11,15 +11,15 @@
 	<link rel="sitemap" href="/sitemap.xml" type="application/xml" />
 
 	<meta name="theme-color" content="white" />
-	<!-- <link rel="apple-touch-icon" href={touch} /> -->
+	<link rel="apple-touch-icon" href={touch} />
 
 	<meta property="og:url" content={$page.url.href} />
-	<meta property="og:site_name" content="Dagger" />
+	<meta property="og:site_name" content="DAG Monster" />
 	<meta property="og:type" content="website" />
 
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@dagger" />
-	<meta name="twitter:creator" content="@dagger" />
+	<meta name="twitter:site" content="@dagmonster" />
+	<meta name="twitter:creator" content="@dagmonster" />
 	<meta name="twitter:domain" content={$page.url.host} />
 	<meta name="twitter:url" content={$page.url.href} />
 </svelte:head>
