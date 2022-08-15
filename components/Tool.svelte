@@ -23,7 +23,7 @@
 <svelte:window on:keydown={onKeyDown} />
 
 <button
-	name={tool}
+	aria-label={tool}
 	aria-current={$currentTool === tool ? 'true' : undefined}
 	on:click={setTool}
 >
