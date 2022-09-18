@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { browser } from '$app/env'
+	import { browser } from '$app/environment'
 
 	import type Node from '$lib/node'
 	import NODE_RADIUS from '$lib/node/radius'

@@ -1,16 +1,18 @@
-import type { RequestHandler } from '@sveltejs/kit'
 import type { WebAppManifest } from 'web-app-manifest'
+
+import type { RequestHandler } from './$types'
+import { base } from '$app/paths'
 
 import errorFromValue from '$lib/error/from/value'
 
-import touch from '../images/touch.png'
-import mask from '../images/mask.png'
+import touch from '../../images/touch.png'
+import mask from '../../images/mask.png'
 
 const manifest: WebAppManifest = {
 	dir: 'ltr',
 	lang: 'en-US',
-	scope: '/',
-	start_url: '/',
+	scope: base || '/',
+	start_url: base || '/',
 	name: 'DAG Monster',
 	short_name: 'DAG Monster',
 	description: 'The simplest way to create a DAG and export into LaTeX',
@@ -28,15 +30,14 @@ let data: string | null = null
 
 export const GET: RequestHandler = () => {
 	try {
-		return {
+		return new Response((data ??= JSON.stringify(manifest)), {
 			headers: {
 				'cache-control': 'no-cache',
 				'content-type': 'application/manifest+json'
-			},
-			body: (data ??= JSON.stringify(manifest))
-		}
+			}
+		})
 	} catch (value) {
 		const { code, message } = errorFromValue(value)
-		return { status: code, body: message }
+		return new Response(message, { status: code })
 	}
 }

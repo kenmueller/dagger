@@ -18,17 +18,21 @@ const config = {
 		}
 	}),
 	compilerOptions: {
-		immutable: true
+		immutable: true,
+		hydratable: true
 	},
 	kit: {
 		adapter: adapter(),
 		files: {
 			assets: 'public',
-			hooks: 'hooks',
+			hooks: {
+				server: 'hooks/index.server',
+				client: 'hooks/index.client'
+			},
 			lib: 'lib',
 			routes: 'routes',
 			serviceWorker: 'lib/worker',
-			template: 'lib/index.html'
+			appTemplate: 'lib/app.html'
 		},
 		csp: {
 			directives: {
@@ -37,7 +41,8 @@ const config = {
 				'script-src': ['self', 'unsafe-inline'],
 				'style-src': ['self', 'unsafe-inline']
 			}
-		}
+		},
+		trailingSlash: 'never'
 	}
 }
 
