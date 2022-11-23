@@ -32,30 +32,35 @@
 	import DeleteIcon from '../images/Trash.svelte'
 
 	const share = () => {
-		copy(
-			new URL(
-				`/?nodes=${encodeURIComponent(
-					JSON.stringify(
-						Object.entries($nodes).map(([id, node]) => [
-							id,
-							nearestDivisor(node.x, GRID_SPACING),
-							nearestDivisor(node.y, GRID_SPACING),
-							node.name,
-							node.color
-						])
-					)
-				)}&arrows=${encodeURIComponent(
-					JSON.stringify($arrows.map(({ from, to }) => [from, to]))
-				)}`,
-				$page.url
-			).href
-		)
+		const url = new URL(
+			`/?nodes=${encodeURIComponent(
+				JSON.stringify(
+					Object.entries($nodes).map(([id, node]) => [
+						id,
+						nearestDivisor(node.x, GRID_SPACING),
+						nearestDivisor(node.y, GRID_SPACING),
+						node.name,
+						node.color
+					])
+				)
+			)}&arrows=${encodeURIComponent(
+				JSON.stringify($arrows.map(({ from, to }) => [from, to]))
+			)}`,
+			$page.url
+		).href
+
+		copy(url)
+		copy(url)
 
 		alert('Copied graph URL to clipboard')
 	}
 
 	const exportDocument = () => {
-		copy(_exportDocument($nodes, $arrows))
+		const code = _exportDocument($nodes, $arrows)
+
+		copy(code)
+		copy(code)
+
 		alert('Copied TikZ code to clipboard')
 	}
 
@@ -129,7 +134,8 @@
 	on:mousemove={onCursorMove}
 	on:touchmove={onCursorMove}
 	on:mouseup={onCursorUp}
-	on:touchend={onCursorUp} />
+	on:touchend={onCursorUp}
+/>
 
 <MetaImage />
 <MetaTitle />
