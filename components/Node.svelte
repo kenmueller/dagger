@@ -26,12 +26,13 @@
 	let input: HTMLInputElement | null = null
 	$: input?.focus()
 
+	let text: HTMLParagraphElement | null = null
+
 	let editing = false
 
 	$: result = browser ? latexRef(node.name) : null
 
-	const edit = (event: MouseEvent) => {
-		event.stopPropagation()
+	const edit = () => {
 		editing = true
 	}
 
@@ -50,7 +51,7 @@
 	}
 
 	const blurWithClick = ({ target }: MouseEvent) => {
-		if (input && input !== target) editing = false
+		if (text && text !== target && input && input !== target) editing = false
 	}
 
 	let draggingCursor: Cursor | null = null
@@ -133,8 +134,10 @@
 	on:mousemove={onCursorMove}
 	on:touchmove={onCursorMove}
 	on:mouseup={onCursorUp}
-	on:touchend={onCursorUp} />
+	on:touchend={onCursorUp}
+/>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
 	class="outer"
 	style="
@@ -149,7 +152,6 @@
 	on:touchstart={onCursorDown}
 	on:mouseup={onNodeCursorUp}
 	on:touchend={onNodeCursorUp}
-	on:click|stopPropagation
 >
 	<div class="inner">
 		{#if editing}
@@ -160,7 +162,7 @@
 				on:input={onInput}
 			/>
 		{/if}
-		<p class:editable={!editing} on:click={edit}>
+		<p bind:this={text} class:editable={!editing} on:click={edit}>
 			{#if !node.name}
 				<span class="placeholder">Rendered LaTeX</span>
 			{:else if result}
