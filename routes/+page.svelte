@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import copy from 'copy-to-clipboard'
+	import { saveAs } from 'file-saver'
 
 	import { page } from '$app/stores'
 
@@ -19,7 +20,8 @@
 	import currentTool from '$lib/tool/current'
 	import getId from '$lib/id'
 	import cursorHandler from '$lib/cursor/handler'
-	import nearestDivisor from '$lib/nearest/divisor'
+	import getShareUrl from '$lib/share/url'
+	import errorFromValue from '$lib/error/from/value'
 	import MetaImage from '../components/Meta/Image.svelte'
 	import MetaTitle from '../components/Meta/Title.svelte'
 	import MetaDescription from '../components/Meta/Description.svelte'
@@ -31,28 +33,37 @@
 	import ArrowIcon from '../images/Arrow.svelte'
 	import DeleteIcon from '../images/Trash.svelte'
 
+	$: viewType = $page.url.searchParams.get('view') || null
+
 	const share = () => {
-		const url = new URL(
-			`/?nodes=${encodeURIComponent(
-				JSON.stringify(
-					Object.entries($nodes).map(([id, node]) => [
-						id,
-						nearestDivisor(node.x, GRID_SPACING),
-						nearestDivisor(node.y, GRID_SPACING),
-						node.name,
-						node.color
-					])
-				)
-			)}&arrows=${encodeURIComponent(
-				JSON.stringify($arrows.map(({ from, to }) => [from, to]))
-			)}`,
-			$page.url
-		).href
+		const url = getShareUrl($page.url)
 
 		copy(url)
 		copy(url)
 
 		alert('Copied graph URL to clipboard')
+	}
+
+	let saveImageLoading = false
+
+	const saveImage = async () => {
+		try {
+			if (saveImageLoading) return
+			saveImageLoading = true
+
+			const response = await fetch(
+				`https://sitepic.onrender.com?url=${encodeURIComponent(
+					getShareUrl('https://dag.monster')
+				)}&wait=load&width=1920&height=1080`
+			)
+
+			saveAs(await response.blob(), 'graph.png')
+		} catch (error) {
+			console.error(error)
+			alert(errorFromValue(error).message)
+		} finally {
+			saveImageLoading = false
+		}
 	}
 
 	const exportDocument = () => {
@@ -109,25 +120,6 @@
 				break
 		}
 	})
-
-	onMount(() => {
-		Object.defineProperty(window, 'nodes', {
-			get: () => $nodes,
-			set: (newNodes: Record<string, Node>) => ($nodes = newNodes),
-			configurable: true
-		})
-
-		Object.defineProperty(window, 'arrows', {
-			get: () => $arrows,
-			set: (newArrows: Arrow<string>[]) => ($arrows = newArrows),
-			configurable: true
-		})
-
-		return () => {
-			delete (window as { nodes?: Record<string, Node> }).nodes
-			delete (window as { arrows?: Arrow<string>[] }).arrows
-		}
-	})
 </script>
 
 <svelte:body
@@ -141,14 +133,21 @@
 <MetaTitle />
 <MetaDescription />
 
-<header>
-	<h1>DAG Monster</h1>
-	<button on:click={share}>Share</button>
-	<button on:click={exportDocument}>Export</button>
-</header>
+{#if viewType === null}
+	<header>
+		<h1>DAG Monster</h1>
+		<button on:click={saveImage} aria-busy={saveImageLoading || undefined}>
+			{saveImageLoading ? 'Saving...' : 'Save as PNG'}
+		</button>
+		<button on:click={share}>Share</button>
+		<button on:click={exportDocument}>Export</button>
+	</header>
+{/if}
 <main on:mousedown={onCursorDown} on:touchstart={onCursorDown}>
-	<span class="x" style="--y: {$center.y}px;" />
-	<span class="y" style="--x: {$center.x}px;" />
+	{#if viewType === null}
+		<span class="x" style="--y: {$center.y}px;" />
+		<span class="y" style="--x: {$center.x}px;" />
+	{/if}
 	{#each Object.entries($nodes) as [id, node] (id)}
 		<NodeElement {id} {node} />
 	{/each}
@@ -182,20 +181,22 @@
 		</svg>
 	{/if}
 </main>
-<footer>
-	<ToolButton tool="pointer" keys={['1', 'a', 'j']}>
-		<PointerIcon />
-	</ToolButton>
-	<ToolButton tool="node" keys={['2', 's', 'k']}>
-		<NodeIcon />
-	</ToolButton>
-	<ToolButton tool="arrow" keys={['3', 'd', 'l']}>
-		<ArrowIcon />
-	</ToolButton>
-	<ToolButton tool="delete" keys={['4', 'f', ';']}>
-		<DeleteIcon />
-	</ToolButton>
-</footer>
+{#if viewType === null}
+	<footer>
+		<ToolButton tool="pointer" keys={['1', 'a', 'j']}>
+			<PointerIcon />
+		</ToolButton>
+		<ToolButton tool="node" keys={['2', 's', 'k']}>
+			<NodeIcon />
+		</ToolButton>
+		<ToolButton tool="arrow" keys={['3', 'd', 'l']}>
+			<ArrowIcon />
+		</ToolButton>
+		<ToolButton tool="delete" keys={['4', 'f', ';']}>
+			<DeleteIcon />
+		</ToolButton>
+	</footer>
+{/if}
 
 <style lang="scss">
 	header {
@@ -217,6 +218,11 @@
 		pointer-events: all;
 		color: colors.$blue;
 		transition: opacity 0.3s;
+
+		&[aria-busy] {
+			pointer-events: none;
+			opacity: 0.5;
+		}
 
 		&:hover {
 			opacity: 0.7;
