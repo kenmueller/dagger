@@ -5,7 +5,10 @@ import arrows from '$lib/arrow/arrows'
 import nearestDivisor from '$lib/nearest/divisor'
 import GRID_SPACING from '$lib/grid/spacing'
 
-const shareUrl = (origin: string | URL) =>
+const shareUrl = (
+	origin: string | URL,
+	{ view = null }: { view?: 'main' | null } = {}
+) =>
 	new URL(
 		`/?nodes=${encodeURIComponent(
 			JSON.stringify(
@@ -19,7 +22,7 @@ const shareUrl = (origin: string | URL) =>
 			)
 		)}&arrows=${encodeURIComponent(
 			JSON.stringify(get(arrows).map(({ from, to }) => [from, to]))
-		)}`,
+		)}${view ? `&view=${encodeURIComponent(view)}` : ''}`,
 		origin
 	).href
 

@@ -32,6 +32,7 @@
 	import NodeIcon from '../images/Node.svelte'
 	import ArrowIcon from '../images/Arrow.svelte'
 	import DeleteIcon from '../images/Trash.svelte'
+	import HttpError from '$lib/error/http'
 
 	$: viewType = $page.url.searchParams.get('view') || null
 
@@ -53,9 +54,12 @@
 
 			const response = await fetch(
 				`https://sitepic.onrender.com?url=${encodeURIComponent(
-					getShareUrl('https://dag.monster')
-				)}&wait=load&width=1920&height=1080`
+					getShareUrl('https://dag.monster', { view: 'main' })
+				)}&wait=load&width=1280&height=720`
 			)
+
+			if (!response.ok)
+				throw new HttpError(response.status, await response.text())
 
 			saveAs(await response.blob(), 'graph.png')
 		} catch (error) {
