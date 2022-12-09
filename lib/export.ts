@@ -10,7 +10,7 @@ const exportDocument = (
 	return `\\usepackage{tikz}
 \\usetikzlibrary{arrows}
 
-\\begin{tikzpicture}[->, >=stealth', thick, every node/.style={circle, fill, inner sep=2pt}, every label/.append style={rectangle}]
+\\begin{tikzpicture}[->, >=stealth', thick, every node/.style={circle, fill, inner sep=2pt, scale=1.3}, every label/.append style={rectangle}]
 ${Object.entries(nodes)
 	.map(
 		([id, node]) =>
