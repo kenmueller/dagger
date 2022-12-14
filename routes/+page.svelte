@@ -95,7 +95,8 @@
 						x: roundToNearest($currentCursor.x, GRID_SPACING),
 						y: roundToNearest($currentCursor.y, GRID_SPACING),
 						name: 'Variable',
-						color: 'red'
+						color: 'red',
+						rotation: 0
 					}
 				}
 

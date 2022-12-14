@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment'
 
+	import type Cursor from '$lib/cursor'
 	import type Node from '$lib/node'
 	import NODE_RADIUS from '$lib/node/radius'
 	import GRID_SPACING from '$lib/grid/spacing'
@@ -14,9 +15,9 @@
 	import center from '$lib/center'
 	import currentTool from '$lib/tool/current'
 	import CenteredInput from './Input/Centered.svelte'
+	import Rotate from '../images/Rotate.svelte'
 
 	import '../styles/katex.less'
-	import type Cursor from '$lib/cursor'
 
 	const latexRef = toRef(latex)
 
@@ -31,6 +32,16 @@
 	let editing = false
 
 	$: result = browser ? latexRef(node.name) : null
+
+	const rotate = () => {
+		$nodes = {
+			...$nodes,
+			[id]: {
+				...node,
+				rotation: ((node.rotation + 90) % 360) as 0 | 90 | 180 | 270
+			}
+		}
+	}
 
 	const edit = () => {
 		editing = true
@@ -153,7 +164,12 @@
 	on:mouseup={onNodeCursorUp}
 	on:touchend={onNodeCursorUp}
 >
-	<div class="inner">
+	{#if editing}
+		<button class="rotate" on:click|stopPropagation={rotate}>
+			<Rotate />
+		</button>
+	{/if}
+	<div class="inner" data-rotation={node.rotation}>
 		{#if editing}
 			<CenteredInput
 				bind:ref={input}
@@ -191,14 +207,57 @@
 		transform: translate(-50%, -50%);
 	}
 
+	.rotate {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+
+		> :global(svg) {
+			height: 1.3rem;
+			color: white;
+		}
+	}
+
 	.inner {
 		display: flex;
+		position: absolute;
+	}
+
+	[data-rotation='0'] {
 		flex-direction: column;
 		align-items: center;
-		position: absolute;
 		left: 50%;
 		bottom: calc(5px + 2 * var(--radius));
 		transform: translateX(-50%);
+	}
+
+	[data-rotation='90'] {
+		flex-direction: column;
+		left: calc(100% + 10px);
+		bottom: calc(4px);
+	}
+
+	[data-rotation='180'] {
+		flex-direction: column-reverse;
+		align-items: center;
+		left: 50%;
+		top: calc(5px + 2 * var(--radius));
+		transform: translateX(-50%);
+
+		p {
+			margin-top: 0;
+			margin-bottom: 0.3rem;
+		}
+	}
+
+	[data-rotation='270'] {
+		flex-direction: column;
+		align-items: flex-end;
+		right: calc(100% + 10px);
+		bottom: calc(4px);
 	}
 
 	.inner > :global(input) {

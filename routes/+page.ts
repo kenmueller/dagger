@@ -12,12 +12,18 @@ export const load: PageLoad = ({ url }) => {
 	try {
 		const nodesString = url.searchParams.get('nodes')
 		const nodesValue = (JSON.parse(nodesString || 'null') || []) as
-			| [string, number, number, string, string][]
+			| [string, number, number, string, string, number][]
 
 		const nodesMap = Object.fromEntries(
-			nodesValue.map(([id, x, y, name, color]) => [
+			nodesValue.map(([id, x, y, name, color, rotation]) => [
 				id,
-				{ x: x * GRID_SPACING, y: y * GRID_SPACING, name, color }
+				{
+					x: x * GRID_SPACING,
+					y: y * GRID_SPACING,
+					name,
+					color,
+					rotation: rotation as 0 | 90 | 180 | 270
+				}
 			])
 		)
 
