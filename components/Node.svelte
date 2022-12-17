@@ -25,7 +25,7 @@
 	export let node: Node
 
 	let input: HTMLInputElement | null = null
-	$: input?.focus()
+	$: input?.select()
 
 	let text: HTMLParagraphElement | null = null
 
