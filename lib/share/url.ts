@@ -17,7 +17,8 @@ const shareUrl = (
 					nearestDivisor(node.x, GRID_SPACING),
 					nearestDivisor(node.y, GRID_SPACING),
 					node.name,
-					node.color
+					node.color,
+					node.rotation
 				])
 			)
 		)}&arrows=${encodeURIComponent(
